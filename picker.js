@@ -1,4 +1,4 @@
-import { Color, colorToStyle, loadImage } from "../util.js";
+import { Color, colorToStyle, loadImage } from "./util.js";
 import canvasSketch from "https://cdn.jsdelivr.net/npm/canvas-sketch@0.7.7/dist/canvas-sketch.m.js";
 // import { quantize } from "https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js";
 
