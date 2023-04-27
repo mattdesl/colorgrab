@@ -8,6 +8,10 @@ A small open source tool to pick colors from an image. Features:
 - Copy all swatches as JSON
 - Various output formats: `hex, srgb, lab, lch, oklch`
 
+Currently desktop only.
+
+<img src="images/screen.png" width="50%" />
+
 ## demo
 
 https://mattdesl.github.io/colorgrab

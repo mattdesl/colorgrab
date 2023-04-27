@@ -1,4 +1,4 @@
-import { Color, colorToStyle, loadImage } from "./util.js";
+import { Color, colorToStyle, loadImage, attachImageDrop } from "./util.js";
 import canvasSketch from "https://cdn.jsdelivr.net/npm/canvas-sketch@0.7.7/dist/canvas-sketch.m.js";
 // import { quantize } from "https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js";
 
@@ -6,43 +6,6 @@ const settings = {
   dimensions: [1024, 1024],
   hotkeys: false,
 };
-
-function attachImageDrop({ container = window, onDrop }) {
-  function handlerFunction(ev) {
-    ev.preventDefault();
-    if (ev.type === "drop") {
-      let dt = ev.dataTransfer;
-      let files = dt.files;
-      if (!files.length) return;
-      const file = files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        const img = document.createElement("img");
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-          onDrop(null, img);
-        };
-        img.onerror = () =>
-          onDrop(new Error(`Could not load image: ${file.name}`));
-        img.src = reader.result;
-      };
-      reader.onerror = () =>
-        onDrop(new Error(`Could not read file: ${file.name}`));
-    }
-  }
-
-  container.addEventListener("dragenter", handlerFunction, false);
-  container.addEventListener("dragleave", handlerFunction, false);
-  container.addEventListener("dragover", handlerFunction, false);
-  container.addEventListener("drop", handlerFunction, false);
-  return () => {
-    container.removeEventListener("dragenter", handlerFunction, false);
-    container.removeEventListener("dragleave", handlerFunction, false);
-    container.removeEventListener("dragover", handlerFunction, false);
-    container.removeEventListener("drop", handlerFunction, false);
-  };
-}
 
 function picker(opts = {}) {
   async function sketch(props) {
@@ -218,9 +181,18 @@ function picker(opts = {}) {
     jsonButton.style.display = "none";
 
     window.addEventListener("click", (ev) => {
-      ev.preventDefault();
       if (!curColor) return;
       if (!showLoupe) return;
+      const target = ev.target;
+      if (
+        !target ||
+        (target !== props.canvas && !target.classList.contains("picker-swatch"))
+      ) {
+        return;
+      }
+
+      ev.preventDefault();
+
       navigator.clipboard.writeText(curText);
       clearTimeout(clickTimer);
       loupeText.textContent = "Copied to clipboard!";

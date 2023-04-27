@@ -48,3 +48,40 @@ export function loadImage(opt = {}) {
     image.src = opt.url;
   });
 }
+
+export function attachImageDrop({ container = window, onDrop }) {
+  function handlerFunction(ev) {
+    ev.preventDefault();
+    if (ev.type === "drop") {
+      let dt = ev.dataTransfer;
+      let files = dt.files;
+      if (!files.length) return;
+      const file = files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        const img = document.createElement("img");
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          onDrop(null, img);
+        };
+        img.onerror = () =>
+          onDrop(new Error(`Could not load image: ${file.name}`));
+        img.src = reader.result;
+      };
+      reader.onerror = () =>
+        onDrop(new Error(`Could not read file: ${file.name}`));
+    }
+  }
+
+  container.addEventListener("dragenter", handlerFunction, false);
+  container.addEventListener("dragleave", handlerFunction, false);
+  container.addEventListener("dragover", handlerFunction, false);
+  container.addEventListener("drop", handlerFunction, false);
+  return () => {
+    container.removeEventListener("dragenter", handlerFunction, false);
+    container.removeEventListener("dragleave", handlerFunction, false);
+    container.removeEventListener("dragover", handlerFunction, false);
+    container.removeEventListener("drop", handlerFunction, false);
+  };
+}
