@@ -206,8 +206,11 @@ function picker(opts = {}) {
       }, 1500);
     });
 
+    props.canvas.style.display = "none";
+
     if (data.url) {
       image = await loadImage(data);
+      props.canvas.style.display = "";
       resizeStyle();
       redraw(image, false);
     }
